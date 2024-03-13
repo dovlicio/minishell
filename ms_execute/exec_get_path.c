@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_get_path.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 11:07:03 by hp                #+#    #+#             */
-/*   Updated: 2024/02/17 15:12:11 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 18:48:20 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,15 +53,15 @@ static int	ft_path_check(t_minishell *shell, char *s2, char **path)
 	*path = ft_strdup(shell->cmd_args[0]);
 	if (!*(path))
 		return (ft_print_error(shell, ERROR_MALLOC_FAIL, *path, 1), -1);
+	if (!ft_is_abs_or_rel(*path))
+		return (ft_print_error(shell, ERROR_CMD_NOT_FOUND, *path, 127), -12);
 	if (access(*path, F_OK) == 0 && access(*path, X_OK) != 0)
 		return (ft_print_error(shell, ERROR_PERMISSION_DENIED, *path, 126), -9);
 	if (!shell->cmd_args[0][0] || (access(*path, F_OK) == 0 && \
-		access(*path, X_OK) == 0 && !ft_is_dir(path)) || \
-		!ft_is_abs_or_rel(*path))
+		access(*path, X_OK) == 0 && !ft_is_dir(path)))
 		return (0);
 	if (ft_is_dir(path) == 2)
-		return (ft_print_error(shell, \
-				ERROR_IS_DIR, shell->cmd_args[0], 126), -11);
+		return (ft_print_error(shell, ERROR_IS_DIR, *path, 126), -11);
 	return (ft_print_error(shell, ERROR_NO_SUCH_FILE, *path, 127), -12);
 }
 
@@ -77,7 +77,8 @@ int	ft_get_path(t_minishell *shell, char **path)
 		*path = ft_strdup(shell->cmd_args[0]);
 		if (!*path)
 			return (ft_print_error(shell, ERROR_MALLOC_FAIL, NULL, 1), -1);
-		if (ft_is_abs_or_rel(*path) && access(*path, F_OK) == 0)
+		if (ft_is_abs_or_rel(*path) && access(*path, F_OK) == 0 && \
+			ft_is_dir(path) == 2)
 			return (ft_print_error(shell, ERROR_IS_DIR, *path, 126), \
 					free(*path), 2);
 		return (0);

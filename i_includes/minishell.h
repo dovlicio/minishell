@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 08:05:18 by vdamnjan          #+#    #+#             */
-/*   Updated: 2024/02/16 17:04:57 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 16:14:32 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,19 @@ typedef struct s_token
 	struct s_token	*previous;
 }					t_token;
 
+typedef struct s_heredocs
+{
+	int					fd;
+	struct s_heredocs	*next;
+}					t_heredocs;
+
 typedef struct s_minishell
 {
 	char			*user_input;
 	t_token			*tokens;
 	t_token			*current_token;
+	t_heredocs		*heredoc_list;
+	t_heredocs		*current_heredoc;
 	char			**cmd_args;
 	char			**envp;
 	char			**paths;
@@ -66,7 +74,7 @@ typedef struct s_minishell
 	int				out_redirect;
 	char			*err_msg;
 	int				logo;
-	struct termios	original_term;
+	int				sig_heredoc;
 }					t_minishell;
 
 /*--------------------INIT_SHELL-------------------*/
@@ -74,7 +82,6 @@ char	**ft_extract_envp(char **envp);
 void	ft_init_prompt(t_minishell *shell);
 void	ft_init_shell(t_minishell *shell, int argc, char **argv, char **envp);
 void	ft_init_logo(void);
-void	ft_init_logo_1(void);
 
 /*----------------------SIGNALS--------------------*/
 void	ft_signals(void);
@@ -97,12 +104,17 @@ int		ft_parse_redirections(t_minishell *shell);
 int		ft_parse_output(t_minishell *shell, char *str, int n);
 int		ft_parse_input(t_minishell *shell, char *str);
 int		ft_parse_heredoc(t_minishell *shell, char *str);
+int		ft_read_input(t_minishell *shell, char *delim, int fd);
+char	*ft_readline_init(t_minishell *shell, char *delimiter, int fd);
+int		ft_heredoc_expander(t_minishell *shell, \
+							char *input, char *delim, int fd);
+int		ft_init_heredocs(t_minishell *shell);
 
 /*-------------------PARSING-UTILS-----------------*/
 char	**ft_delete_arg(t_minishell *shell, char *str);
 void	ft_set_error(t_minishell *shell, char *str);
 char	*ft_remove_quotes(char *delim);
-void	ft_if_cleared_put_logo(t_minishell *shell, char *path);
+void	ft_clear_check(t_minishell *shell, char *path);
 
 /*---------------------EXPANSION-------------------*/
 int		ft_expand_vars(t_minishell *shell);
@@ -126,8 +138,9 @@ int		ft_export(t_minishell *shell, int *fd);
 int		ft_cd(t_minishell *shell);
 int		ft_exit(t_minishell *shell);
 int		ft_get_path(t_minishell *shell, char **path);
-void	ft_child_exit(t_minishell *shell, int *status, char **path);
+void	ft_child_exit(t_minishell *shell, int *status);
 void	ft_close_redirections(t_minishell *shell);
+void	ft_shlvl(t_minishell *shell, char *path, int what);
 
 /*--------------------EXEC-UTILS-------------------*/
 char	*ft_extract_env_value(char **envp, char *var);
@@ -154,5 +167,6 @@ int		ft_set_exit(t_minishell *shell, int status);
 void	free_matrix(char **matrix);
 void	ft_clean_all(t_minishell *shell, int exit_status, char *error);
 void	ft_clean(t_minishell *shell);
+void	ft_clean_heredocs(t_heredocs **heredocs);
 
 #endif

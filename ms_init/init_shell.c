@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_shell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 07:17:06 by vdamnjan          #+#    #+#             */
-/*   Updated: 2024/02/17 15:21:09 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 18:59:11 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,16 @@
 void	ft_clear(char **envp)
 {
 	int		child_pid;
-	char	*clear_args[] = {"/usr/bin/clear", NULL};
+	char	*clear_args[2];
 
+	clear_args[0] = "/usr/bin/clear";
+	clear_args[1] = NULL;
 	child_pid = fork();
 	if (!child_pid)
-		execve("/usr/bin/clear", clear_args, envp);
+	{
+		if (execve("/usr/bin/clear", clear_args, envp) == -1)
+			(ft_putstr_fd("minishell: clear: failed to execute\n", 1), exit(1));
+	}
 	wait(NULL);
 	(void)envp;
 }
@@ -33,7 +38,7 @@ void	ft_init_shell(t_minishell *shell, int argc, char **argv, char **envp)
 	if (!shell->envp)
 		ft_clean_all(shell, 1, ERROR_ENV_IMPORT_FAILED);
 	ft_clear(envp);
-	ft_init_logo_1();
+	ft_init_logo();
 	shell->exit_status = 0;
 	shell->fd_stdin = 0;
 	shell->fd_stdout = 1;
@@ -49,8 +54,12 @@ void	ft_init_prompt(t_minishell *shell)
 	shell->user_input = \
 		readline("\001\e\x1b[36m\002minishell\001\e\x1b[0m\002: ");
 	if (!shell->user_input)
+	{
+		if (g_exit == 1)
+			shell->exit_status = 130;
 		(ft_putstr_fd("exit\n", 1), \
 		ft_clean_all(shell, shell->exit_status, NULL));
+	}
 	if (shell->user_input[0])
 		add_history(shell->user_input);
 }

@@ -6,7 +6,7 @@
 /*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 08:05:04 by vdamnjan          #+#    #+#             */
-/*   Updated: 2024/02/13 21:49:10 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/19 23:55:19 by hp               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,6 @@
 # define ERROR_ENV_IMPORT_FAILED "minishell: Failed to import envp\n"
 # define ERR_NH                   "HOME not set\n"
 # define ERROR_HEREDOC_EOF_DELIM "warning: here-document delimited \
-                                    by end-of-file\n"
+by end-of-file\n"
 
 #endif

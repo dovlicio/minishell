@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_exit.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:03:54 by vdamnjan          #+#    #+#             */
-/*   Updated: 2024/02/17 15:19:31 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 18:58:32 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,10 @@ static int	ft_check_exit_args(t_minishell *shell)
 	if (ft_check_digit(shell->cmd_args[1]) == -1)
 	{
 		if (!ft_is_piped(shell))
-			(ft_print_error(shell, ERROR_NUMERIC_REQUIRED, NULL, 2), \
+			(write(2, "exit\n", 5), \
+			ft_print_error(shell, ERROR_NUMERIC_REQUIRED, "exit: ", 2), \
 			ft_clean_all(shell, 2, NULL));
-		return (ft_print_error(shell, ERROR_NUMERIC_REQUIRED, NULL, 2), -1);
+		return (ft_print_error(shell, ERROR_NUMERIC_REQUIRED, "exit: ", 2), -1);
 	}
 	i = 0;
 	while (shell->cmd_args[i])
@@ -89,11 +90,14 @@ int	ft_exit(t_minishell *shell)
 {
 	int	exit;
 
-	exit = 0;
+	if (g_exit == 1)
+		exit = 130;
+	else
+		exit = shell->exit_status;
 	if (!shell->cmd_args[1])
 	{
 		if (!ft_is_piped(shell))
-			(ft_putstr_fd("exit\n", 1), ft_clean_all(shell, 0, NULL));
+			(ft_putstr_fd("exit\n", 1), ft_clean_all(shell, exit, NULL));
 		return (0);
 	}
 	if (ft_check_exit_args(shell) == -1)
@@ -107,7 +111,5 @@ int	ft_exit(t_minishell *shell)
 	ft_calc_exit(&exit);
 	if (!ft_is_piped(shell))
 		(ft_putstr_fd("exit\n", 1), ft_clean_all(shell, exit, NULL));
-	else
-		return (ft_set_exit(shell, exit), -1);
-	return (0);
+	return (ft_set_exit(shell, exit), -1);
 }

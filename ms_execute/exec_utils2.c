@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 21:39:21 by hp                #+#    #+#             */
-/*   Updated: 2024/02/17 12:47:44 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/21 17:18:06 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,24 @@
 
 void	ft_close_redirections(t_minishell *shell)
 {
-	if (shell->in_redirect)
+	if (shell->in_redirect && shell->fd_stdin != 0)
 	{
 		close(shell->fd_stdin);
 		shell->fd_stdin = 0;
 	}
-	if (shell->out_redirect)
+	if (shell->out_redirect && shell->fd_stdout != 1)
 	{
 		close(shell->fd_stdout);
 		shell->fd_stdout = 1;
 	}
 }
 
-void	ft_child_exit(t_minishell *shell, int *status, char **path)
+void	ft_child_exit(t_minishell *shell, int *status)
 {
 	if (WIFEXITED(*status))
 		shell->exit_status = WEXITSTATUS(*status);
-	if (WIFSIGNALED(*status) && WTERMSIG(*status) == 3)
-		shell->exit_status = 131;
-	if (WIFSIGNALED(*status) && WTERMSIG(*status) == 2)
-		shell->exit_status = 130;
-	(ft_signals(), free(*path));
+	if (WIFSIGNALED(*status))
+		shell->exit_status = WTERMSIG(*status) + 128;
 }
 
 char	**ft_import_env(t_minishell *shell, char *env)

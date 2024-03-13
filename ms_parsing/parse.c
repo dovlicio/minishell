@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 07:20:10 by vdamnjan          #+#    #+#             */
-/*   Updated: 2024/02/13 16:28:27 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 15:50:28 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,14 @@ int	ft_parse_redirections(t_minishell *shell)
 	status = 0;
 	while (shell->cmd_args[i])
 	{
-		if (!ft_strncmp(shell->cmd_args[i], "<<", 2))
+		if (ft_strncmp(shell->cmd_args[i], "<<", 3) == 0)
 			status = ft_parse_heredoc(shell, shell->cmd_args[i]);
-		else if (!ft_strncmp(shell->cmd_args[i], "<", 1))
+		else if (ft_strncmp(shell->cmd_args[i], "<", 2) == 0)
 			status = ft_parse_input(shell, shell->cmd_args[i]);
-		else if (!ft_strncmp(shell->cmd_args[i], ">>", 2))
+		else if (ft_strncmp(shell->cmd_args[i], ">>", 3) == 0)
+			status = ft_parse_output(shell, shell->cmd_args[i], 3);
+		else if (ft_strncmp(shell->cmd_args[i], ">", 2) == 0)
 			status = ft_parse_output(shell, shell->cmd_args[i], 2);
-		else if (!ft_strncmp(shell->cmd_args[i], ">", 1))
-			status = ft_parse_output(shell, shell->cmd_args[i], 1);
 		else
 			i++;
 		ft_signals();
@@ -79,6 +79,8 @@ int	ft_parse_redirections(t_minishell *shell)
 int	ft_parse(t_minishell *shell)
 {
 	if (ft_check_syntax_errors(shell) == -1)
+		return (-1);
+	if (ft_init_heredocs(shell) == -1)
 		return (-1);
 	if (ft_init_cmd_args(shell) == -1)
 		return (-1);

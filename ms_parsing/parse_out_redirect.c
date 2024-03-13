@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_out_redirect.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 14:46:50 by hp                #+#    #+#             */
-/*   Updated: 2024/02/13 15:19:15 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 15:08:44 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,12 @@ static int	ft_setup_stdout(t_minishell *shell, int *i, char *copy, int n)
 {
 	if (shell->fd_stdout > 1)
 		close(shell->fd_stdout);
+	(void)copy;
 	if (ft_remove_empty(shell, shell->cmd_args[(*i) + 1]))
 		return (free(copy), -1);
 	if (ft_expand(shell, shell->cmd_args[(*i) + 1], *i + 1))
 		return (free(copy), -1);
-	if (n == 1)
+	if (n == 2)
 		shell->fd_stdout = open(shell->cmd_args[(*i) + 1], \
 								O_CREAT | O_WRONLY | O_TRUNC, 0666);
 	else
@@ -75,7 +76,7 @@ int	ft_parse_output(t_minishell *shell, char *str, int n)
 	i = 0;
 	while (shell->cmd_args[i])
 	{
-		if (!ft_strncmp(shell->cmd_args[i], copy, n))
+		if (ft_strncmp(shell->cmd_args[i], copy, n) == 0)
 		{
 			if (ft_setup_stdout(shell, &i, copy, n) == -1)
 				return (-1);

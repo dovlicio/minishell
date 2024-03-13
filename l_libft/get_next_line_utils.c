@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/19 13:16:18 by vdamnjan          #+#    #+#             */
-/*   Updated: 2024/02/17 15:20:15 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 18:58:00 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,4 +79,5 @@ char	*ft_strchr2(const char *s, int c)
 	str[i] = '\0';
 	free(s1_start);
 	return (str);
-} */
+}
+ */

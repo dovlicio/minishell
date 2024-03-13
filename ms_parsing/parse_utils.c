@@ -6,7 +6,7 @@
 /*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 15:19:25 by vdamnjan          #+#    #+#             */
-/*   Updated: 2024/02/15 20:22:51 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/19 23:33:02 by hp               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ static int	ft_copy_and_del(char **new_cmds, t_minishell *shell, char *str)
 	freed = 0;
 	while (shell->cmd_args[j])
 	{
-		if (!freed && ft_strncmp(shell->cmd_args[j], str, ft_strlen(str)) == 0)
+		if (!freed && ft_strncmp(shell->cmd_args[j], str, 1000) == 0)
 		{
 			freed = 1;
 			free(shell->cmd_args[j++]);
@@ -92,10 +92,8 @@ char	**ft_delete_arg(t_minishell *shell, char *str)
 	return (free(shell->cmd_args), new_cmds);
 }
 
-void	ft_if_cleared_put_logo(t_minishell *shell, char *path)
+void	ft_clear_check(t_minishell *shell, char *path)
 {
-	if (!ft_strncmp(path, "/usr/bin/clear", 20) && !shell->piped)
-		shell->logo = 1;
-	else if (!ft_strncmp(path, "clear", 10) && !shell->piped)
+	if (ft_strncmp(path, "/usr/bin/clear", 20) == 0 && !shell->piped)
 		shell->logo = 1;
 }

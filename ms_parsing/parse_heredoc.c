@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parse_heredoc.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:26:53 by hp                #+#    #+#             */
-/*   Updated: 2024/02/17 15:04:53 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/22 18:33:40 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../i_includes/minishell.h"
 
-static int	ft_heredoc_expander(t_minishell *shell, char *input, char *delim)
+int	ft_heredoc_expander(t_minishell *shell, char *input, char *delim, int fd)
 {
 	char	*input3;
 	int		i;
@@ -37,25 +37,31 @@ static int	ft_heredoc_expander(t_minishell *shell, char *input, char *delim)
 				return (ft_print_error(shell, ERROR_MALLOC_FAIL, NULL, 1), -1);
 		}
 	}
-	return (ft_putstr_fd(input3, shell->fd_stdin), \
-			ft_putchar_fd('\n', shell->fd_stdin), free(input3), 0);
+	return (ft_putstr_fd(input3, fd), \
+			ft_putchar_fd('\n', fd), free(input3), 0);
 }
 
-static char	*ft_readline_init(t_minishell *shell, char *delimiter)
+char	*ft_readline_init(t_minishell *shell, char *delimiter, int fd)
 {
 	char	*input;
 
 	input = readline("> ");
 	if (g_exit)
-		return (free(delimiter), close(shell->fd_stdin), \
+	{
+		shell->sig_heredoc = 1;
+		return (free(delimiter), close(fd), \
 				ft_print_error(shell, NULL, NULL, 130), NULL);
+	}
 	if (!input)
-		return (free(delimiter), close(shell->fd_stdin), \
-				ft_print_error(shell, ERROR_HEREDOC_EOF_DELIM, NULL, 0), NULL);
+	{
+		input = ft_strdup(delimiter);
+		return (ft_print_error(shell, ERROR_HEREDOC_EOF_DELIM, \
+				NULL, 131), input);
+	}
 	return (input);
 }
 
-int	ft_read_input(t_minishell *shell, char *delim)
+int	ft_read_input(t_minishell *shell, char *delim, int fd)
 {
 	char	*input;
 	char	*start;
@@ -67,44 +73,30 @@ int	ft_read_input(t_minishell *shell, char *delim)
 	signal(SIGINT, sigint_handler_heredoc);
 	while (1)
 	{
-		input = ft_readline_init(shell, delimiter);
+		input = ft_readline_init(shell, delimiter, fd);
 		if (!input)
 			return (-1);
-		if (!ft_strncmp(input, delimiter, ft_strlen(delimiter) + 1))
+		if (ft_strncmp(input, delimiter, ft_strlen(delimiter) + 1) == 0)
 		{
 			free(input);
 			break ;
 		}
 		start = input;
-		if (ft_heredoc_expander(shell, input, delim) == -1)
-			return (free(start), free(delimiter), close(shell->fd_stdin), -1);
+		if (ft_heredoc_expander(shell, input, delim, fd) == -1)
+			return (free(start), free(delimiter), close(fd), -1);
 		free(start);
 	}
-	(free(delimiter), close(shell->fd_stdin));
+	(free(delimiter), close(fd));
 	return (0);
 }
 
 static int	ft_heredoc_init(t_minishell *shell, char *copy, \
 							char **copy2, int *i)
 {
-	int		tmp_fd;
-
-	if (shell->fd_stdin > 0)
+	if (shell->fd_stdin != 0)
 		close(shell->fd_stdin);
-	shell->fd_stdin = open(shell->cmd_args[*i + 1], \
-							O_CREAT | O_RDWR | O_TRUNC, 0666);
-	if (shell->fd_stdin == -1)
-		return (ft_print_error(shell, ERROR_FILE_OPEN_FAILED, \
-				shell->cmd_args[*i + 1], 1), -1);
-	tmp_fd = open(shell->cmd_args[*i + 1], O_RDWR, 0666);
-	if (tmp_fd == -1)
-		return (ft_print_error(shell, ERROR_NO_SUCH_FILE, \
-				shell->cmd_args[*i + 1], 1), -1);
-	if (unlink(shell->cmd_args[*i + 1]) == -1)
-		return (close(tmp_fd), -1);
-	if (ft_read_input(shell, shell->cmd_args[*i + 1]) == -1)
-		return (close(tmp_fd), -1);
-	shell->fd_stdin = tmp_fd;
+	shell->fd_stdin = shell->current_heredoc->fd;
+	shell->current_heredoc = shell->current_heredoc->next;
 	*copy2 = ft_strdup(shell->cmd_args[*i + 1]);
 	if (!(*copy2))
 		return (ft_print_error(shell, ERROR_MALLOC_FAIL, NULL, 1), -1);
@@ -127,7 +119,7 @@ int	ft_parse_heredoc(t_minishell *shell, char *str)
 	i = 0;
 	while (shell->cmd_args[i])
 	{
-		if (!ft_strncmp(shell->cmd_args[i], copy, ft_strlen(copy)))
+		if (ft_strncmp(shell->cmd_args[i], copy, ft_strlen(copy) + 1) == 0)
 		{
 			if (ft_heredoc_init(shell, copy, &copy2, &i) == -1)
 				return (free(copy), -1);

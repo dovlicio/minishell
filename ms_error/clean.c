@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 07:10:23 by vdamnjan          #+#    #+#             */
-/*   Updated: 2024/02/15 14:07:27 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 15:52:26 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,25 @@ void	ft_clean_all(t_minishell *shell, int exit_status, char *error)
 	exit(exit_status);
 }
 
+static void	ft_close_stds(t_minishell *shell)
+{
+	if (shell->fd_stdin > 0)
+		close(shell->fd_stdin);
+	if (shell->fd_stdout > 1)
+		close(shell->fd_stdout);
+}
+
 void	ft_clean(t_minishell *shell)
 {
 	free_matrix(shell->paths);
 	shell->paths = NULL;
+	ft_clean_heredocs(&shell->heredoc_list);
+	if (shell->sig_heredoc == 1)
+	{
+		shell->exit_status = 130;
+		g_exit = 0;
+	}
+	shell->sig_heredoc = 0;
 	if (shell->cmd_args && shell->cmd_args[0])
 		g_exit = 0;
 	free_matrix(shell->cmd_args);
@@ -64,10 +79,7 @@ void	ft_clean(t_minishell *shell)
 	free(shell->user_input);
 	shell->user_input = NULL;
 	ft_clean_tokens(&(shell->tokens));
-	if (shell->fd_stdin > 0)
-		close(shell->fd_stdin);
-	if (shell->fd_stdout > 1)
-		close(shell->fd_stdout);
+	ft_close_stds(shell);
 	shell->fd_stdin = 0;
 	shell->fd_stdout = 1;
 	if (shell->logo)

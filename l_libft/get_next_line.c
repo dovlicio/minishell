@@ -6,7 +6,7 @@
 /*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/19 13:15:50 by vdamnjan          #+#    #+#             */
-/*   Updated: 2023/10/01 20:39:05 by vdamnjan         ###   ########.fr       */
+/*   Updated: 2024/02/23 18:55:49 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,8 @@ char	*get_next_line(int fd)
 	string = trim_line(string);
 	return (one_line);
 }
-/*
-#include <fcntl.h>
+
+/* #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
 
@@ -133,4 +133,5 @@ int	main()
 	}
 	return (0);
 }
-*/
+
+ */

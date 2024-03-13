@@ -26,7 +26,8 @@ SRC_PARSING = \
 	ms_parsing/parse_utils.c \
 	ms_parsing/parse_out_redirect.c \
 	ms_parsing/parse_in_redirect.c \
-	ms_parsing/parse_heredoc.c
+	ms_parsing/parse_heredoc.c \
+	ms_parsing/parse_init_heredocs.c
 
 SRC_EXECUTE = \
 	ms_execute/exec.c \
@@ -41,7 +42,8 @@ SRC_EXECUTE = \
 	ms_execute/exec_export_utils.c \
 	ms_execute/exec_exit.c \
 	ms_execute/exec_utils2.c \
-	ms_execute/exec_get_path.c
+	ms_execute/exec_get_path.c \
+	ms_execute/exec_shlvl.c
 
 SRC_ERROR = \
 	ms_error/err_msg.c \

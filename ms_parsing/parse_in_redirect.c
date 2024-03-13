@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_in_redirect.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hp <hp@student.42.fr>                      +#+  +:+       +#+        */
+/*   By: vdamnjan <vdamnjan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 15:11:07 by hp                #+#    #+#             */
-/*   Updated: 2024/02/13 15:21:47 by hp               ###   ########.fr       */
+/*   Updated: 2024/02/23 15:08:41 by vdamnjan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ static int	ft_setup_stdin(t_minishell *shell, int *i, char *copy)
 {
 	if (shell->fd_stdin > 0)
 		close(shell->fd_stdin);
+	(void)copy;
 	if (ft_remove_empty(shell, shell->cmd_args[*i + 1]) == -1)
 		return (free(copy), -1);
 	if (ft_expand(shell, shell->cmd_args[*i + 1], *i + 1) == -1)
@@ -69,7 +70,7 @@ int	ft_parse_input(t_minishell *shell, char *str)
 	i = 0;
 	while (shell->cmd_args[i])
 	{
-		if (!ft_strncmp(shell->cmd_args[i], copy, ft_strlen(copy)))
+		if (ft_strncmp(shell->cmd_args[i], copy, ft_strlen(copy) + 1) == 0)
 		{
 			if (ft_setup_stdin(shell, &i, copy) == -1)
 				return (-1);
