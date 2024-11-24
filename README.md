@@ -1,7 +1,7 @@
 # MINISHELL - creating mini version of bash
 
 
-One of the most difficult projects so far in 42 Vienna.
+One of the most difficult projects so far in 42 Vienna where we had to create our version of "bash".
 
 Also one of the most interesting projects where we learned how bash works and much more.
 
